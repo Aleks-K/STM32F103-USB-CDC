@@ -49,6 +49,7 @@
   * @{
   */ 
   /* USER CODE BEGIN 0 */ 
+#include "RingBuffer.h"
   /* USER CODE END 0 */ 
 /**
   * @}
@@ -60,8 +61,8 @@
   /* USER CODE BEGIN 1 */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  4
-#define APP_TX_DATA_SIZE  4
+#define APP_RX_DATA_SIZE  256
+#define APP_TX_DATA_SIZE  256
   /* USER CODE END 1 */  
 /**
   * @}
@@ -241,7 +242,16 @@ static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 7 */ 
   
   // TODO: Data received
-  
+  //CDC_Transmit_FS(Buf, *Len); // Echo
+  for (uint32_t i = 0; i < *Len; i++)
+  {
+    extern RingBuffer_t usbRingBuffer;
+    RB_Push(&usbRingBuffer, Buf[i]);
+  }
+
+  USBD_CDC_SetRxBuffer(hUsbDevice_0, &UserRxBufferFS[0]);
+  USBD_CDC_ReceivePacket(hUsbDevice_0);
+
   return (USBD_OK);
   /* USER CODE END 7 */ 
 }
@@ -260,7 +270,9 @@ static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
 uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
-  /* USER CODE BEGIN 8 */ 
+  /* USER CODE BEGIN 8 */
+  for (uint32_t i = 0; i < Len; i++)
+    UserTxBufferFS[i] = Buf[i];
   USBD_CDC_SetTxBuffer(hUsbDevice_0, UserTxBufferFS, Len);   
   result = USBD_CDC_TransmitPacket(hUsbDevice_0);
   /* USER CODE END 8 */ 

@@ -37,6 +37,9 @@
 #include "usb_device.h"
 
 /* USER CODE BEGIN Includes */
+#include "RingBuffer.h"
+#include "main.h"
+#include "MasterPacketProc.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -115,6 +118,9 @@ int32_t    wTemperature_DegreeCelsius = 0;
 /* Variable to report ADC sequencer status */
 uint8_t         ubSequenceCompleted = RESET;     /* Set when all ranks of the sequence have been converted */
 
+RingBuffer_t usbRingBuffer;
+uint8_t usbRx[UsbRxBufSize];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -135,7 +141,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  RB_InitStatic(&usbRingBuffer, usbRx, UsbRxBufSize);
+  
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -210,6 +217,8 @@ int main(void)
       /* Reset variable for next loop iteration */
       ubSequenceCompleted = RESET;
     }
+    
+    UsbRxProc(&usbRingBuffer);
   }
   /* USER CODE END 3 */
 
