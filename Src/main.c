@@ -213,6 +213,10 @@ int main(void)
       uhADCChannelToDAC_mVolt    = COMPUTATION_DIGITAL_12BITS_TO_VOLTAGE(aADCxConvertedValues[0]);
       uhVrefInt_mVolt            = COMPUTATION_DIGITAL_12BITS_TO_VOLTAGE(aADCxConvertedValues[2]);
       wTemperature_DegreeCelsius = COMPUTATION_TEMPERATURE_STD_PARAMS(aADCxConvertedValues[1]);
+      
+      (*(float*)&FC_Cache[0x40]) = uhADCChannelToDAC_mVolt;
+      (*(float*)&FC_Cache[0x41]) = uhVrefInt_mVolt;
+      (*(float*)&FC_Cache[0x42]) = wTemperature_DegreeCelsius;
 
       /* Reset variable for next loop iteration */
       ubSequenceCompleted = RESET;

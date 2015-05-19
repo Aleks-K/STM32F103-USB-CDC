@@ -25,9 +25,7 @@ uint32_t nRxRdPtrSaved2 = 0;
 uint32_t nPcktPosCnt2 = 0, nPcktPosCntDataEnd2 = 0, nPcktPosCnt2v2 = 0;
 uint8_t bFullPckt2[16+2+MaxPacketDataLength2], nPcktPosLen2 = 0;
 //
-uint16_t Device02, Command2, Answer2, DataHeaderLength2;
-uint32_t PacketTick2;
-uint8_t PrioCnt2;
+uint16_t DataHeaderLength2;
 
 /* Private function prototypes -----------------------------------------------*/
 void MasterPacketDecoder_V1(uint8_t * inBuf, uint16_t len);
@@ -38,7 +36,7 @@ void UsbRxProc(RingBuffer_t *buf);
 
 void MasterPacketDecoder_V1(uint8_t * inBuf, uint16_t len)
 {
-  tPacketHeader *header = (tPacketHeader*)inBuf;
+  PacketHeader_t *header = (PacketHeader_t*)inBuf;
   //
   TmpPacketLength = 0;
   if (header->Device != DeviceId) return;
@@ -197,19 +195,7 @@ void UsbRxProc(RingBuffer_t *buf)
         if (Crc8(bFullPckt2, 15) == v)
         {
           // Parse header buffer
-          uint8_t* ptr = NULL;
-          ptr = (uint8_t*)&Device02;
-          *ptr++ = bFullPckt2[2]; *ptr++ = bFullPckt2[3];
-          ptr = (uint8_t*)&Command2;
-          *ptr++ = bFullPckt2[4]; *ptr++ = bFullPckt2[5];
-          ptr = (uint8_t*)&Answer2;
-          *ptr++ = bFullPckt2[6]; *ptr++ = bFullPckt2[7];
-          ptr = (uint8_t*)&DataHeaderLength2;
-          *ptr++ = bFullPckt2[8]; *ptr++ = bFullPckt2[9];
-          ptr = (uint8_t*)&PacketTick2;
-          *ptr++ = bFullPckt2[10]; *ptr++ = bFullPckt2[11]; *ptr++ = bFullPckt2[12]; *ptr++ = bFullPckt2[13];
-//if (PrioCnt2 == bFullPckt2[14]) { nPcktPosCnt2 = 0; } // ################
-          PrioCnt2 = bFullPckt2[14];
+          DataHeaderLength2 = ((PacketHeader_t*)bFullPckt2)->DataLen;
           // Filter packets by dev (--and cmd--)
           if (DataHeaderLength2 == 0)
           {

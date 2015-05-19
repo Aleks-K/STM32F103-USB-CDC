@@ -12,7 +12,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 #pragma pack(push,1)
-__packed typedef struct tPacketHeader
+__packed typedef struct PacketHeader_t
 {
   uint16_t Marker;
   uint16_t Device;
@@ -23,7 +23,7 @@ __packed typedef struct tPacketHeader
   uint8_t PrioCnt;
   uint8_t HeaderCrc;
   uint16_t DataCrc;
-} tPacketHeader;
+} PacketHeader_t;
 #pragma pack(pop)
 
 typedef struct CoreConfig_t
